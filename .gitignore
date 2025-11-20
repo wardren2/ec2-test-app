@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+## 민감한 정보 포함 - 모든 디렉토리의  application.yaml 제외 (** : 모든 하위 경로를 의미) ##
+**/application.yaml

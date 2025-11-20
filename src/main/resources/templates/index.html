@@ -27,7 +27,84 @@
                 </li>
             </ul>
         </div>
+
+        <!--데이터베이스 연결 정보 카드-->
+        <div class="card info">
+            <h3>데이터베이스 연결</h3>
+            <ul>
+                <li><strong>상태:</strong> <span th:text="${dbStatus}"></span></li>
+                <li><strong>DB:</strong> <span th:text="${dbName}"></span></li>
+                <li><strong>URL:</strong> <span th:text="${dbUrl}" style="font-size: 0.85em; word-break: break-all;"></span></li>
+            </ul>
+        </div>
+
+        <!--게시글 DB 테스트 카드-->
+        <div class="card">
+            <h3>📋 게시글 DB 테스트</h3>
+            <!--AJAX /board API를 호출하여 실시간으로 게시글 목록을 불러옴-->
+            <button onclick="loadBoards()" class="button">게시글 불러오기</button>
+            <div id="board-list" style="margin-top: 20px">
+                <p style="color: #666;">버튼을 클릭하면 DB에서 데이터를 불러옵니다.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>2025 EC2 Test Application | Spring Boot 3.5.7</p>
+        </div>
     </div>
+
+    <script>
+        function loadBoards(){
+
+                const boardList = document.getElementById('board-list');
+                boardList.innerHTML = `<p>⌛ 로딩 중....</p>`
+
+                // Fetch API로 GET 요청 전송
+                fetch('/boards')
+                .then(response => {
+                     // HTTP 응답  상태 확인 (200번대가 아니면 에러)
+                    if(!response.ok){
+                        throw new Error('HTTP ' + response.status)
+                    }
+                    return response.json();     // json 형태로 파싱
+                })
+                .then(data => {
+                    // 데이터가 비어있는 경우 처리
+                    if(data.length == 0){
+                        boardList.innerHTML = `<p>게시글이 없습니다.</p>`
+                    } else {
+                        // 게시글 목록 HTML 생성 시작
+                        let html = '<p style="color: #28a745; font-weight:bold;">DB 연동 성공! 총 ' + data.length + '개의 게시글</p>';
+
+                        html += '<div style="max-height: 400px; overflow-y: auto;">'    // 스크롤 가능한 영역
+
+                        // 각 게시글을 순회하여 HTML 생성
+                        data.forEach((board, index) => {    // board: 게시글 객체, index: 배열 순번(0부터 시작)
+                            html += '<div style="border: 1px solid #ddd; padding: 12px; margin: 10px 0; border-radius: 5px; background: #f8f9fa;">';
+                            html += '<div style="color: #666; font-size: 0.9em;">게시글 #' + (index +1) + ' (ID: ' + board.id + ')</div>';
+                            html += '<div style="font-weight: bold; margin: 5px 0;">' +board.title + '</div>';
+                            html += '<div style="color: #555;">' +board.content + '</div>';
+
+                            html += '</div>';
+
+                        });
+
+
+
+                        html += '</div>'
+
+
+
+                        boardList.innerHTML = html;
+                    }
+                })
+                .catch(error => {
+                    boardList.innerHTML = '<p style="color: red;">❌ 에러 발생: ' + error.message + '</p>';
+                })
+            }
+
+    </script>
+
 </div>
 
 </body>
